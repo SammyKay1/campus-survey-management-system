@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CampusSurveyManagementSystem.Application/CampusSurveyManagementSystem.Application.csproj" />
+  <Project Path="CampusSurveyManagementSystem.Domain/CampusSurveyManagementSystem.Domain.csproj" />
+  <Project Path="CampusSurveyManagementSystem.Infrastructure/CampusSurveyManagementSystem.Infrastructure.csproj" />
+  <Project Path="CampusSurveyManagementSystem.Web/CampusSurveyManagementSystem.Web.csproj" />
+</Solution>

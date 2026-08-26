@@ -1,0 +1,17 @@
+
+namespace CampusSurveyManagementSystem.Application.Surveys.DTOs;
+
+public class QuestionDto
+{
+    public Guid Id { get; init; }
+
+    public string Text { get; init; } = null!;
+
+    public string Type { get; init; } = null!;
+
+    public bool IsRequired { get; init; }
+
+    public int DisplayOrder { get; init; }
+
+    public IReadOnlyCollection<QuestionOptionDto> Options { get; init; } = Array.Empty<QuestionOptionDto>();
+}
