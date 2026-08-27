@@ -1,17 +1,24 @@
 using CampusSurveyManagementSystem.Application;
 using CampusSurveyManagementSystem.Web.Components;
+using CampusSurveyManagementSystem.Application.Common.Interfaces;
+using CampusSurveyManagementSystem.Application.Organizations.Interfaces;
+using CampusSurveyManagementSystem.Application.Organizations.Services;
+using CampusSurveyManagementSystem.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure( builder.Configuration);
 
+builder.Services.AddScoped<IApplicationDbContext>( provider => provider.GetRequiredService<ApplicationDbContext>());
+
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+
 
 
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddControllers();
 

@@ -1,4 +1,5 @@
 
+using CampusSurveyManagementSystem.Application.Common.Interfaces;
 using CampusSurveyManagementSystem.Domain;
 using CampusSurveyManagementSystem.Domain.Auditing;
 using CampusSurveyManagementSystem.Domain.Organizations;
@@ -11,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CampusSurveyManagementSystem.Infrastructure.Persistence;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
