@@ -1,6 +1,4 @@
 
-
-
 using CampusSurveyManagementSystem.Application;
 using CampusSurveyManagementSystem.Web.Components;
 using CampusSurveyManagementSystem.Application.Common.Interfaces;
@@ -9,6 +7,8 @@ using CampusSurveyManagementSystem.Application.Organizations.Services;
 using CampusSurveyManagementSystem.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using CampusSurveyManagementSystem.Application.Surveys.Interfaces;
+using CampusSurveyManagementSystem.Application.Surveys.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +18,15 @@ builder.Services.AddInfrastructure( builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+        /*.EnableDetailedErrors()
+        .EnableSensitiveDataLogging()
+        .LogTo( Console.WriteLine, LogLevel.Information)); */
+
+
 builder.Services.AddScoped<IApplicationDbContext>( provider => provider.GetRequiredService<ApplicationDbContext>());
 
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<ISurveyService, SurveyService>();
 
 
 

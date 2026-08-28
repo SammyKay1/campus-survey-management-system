@@ -16,8 +16,7 @@ public class Question : Entity
 
     public int DisplayOrder { get; private set; }
 
-    public IReadOnlyCollection<QuestionOption> Options =>
-        _options.AsReadOnly();
+    public IReadOnlyCollection<QuestionOption> Options =>  _options.AsReadOnly();
 
     private Question()
     {

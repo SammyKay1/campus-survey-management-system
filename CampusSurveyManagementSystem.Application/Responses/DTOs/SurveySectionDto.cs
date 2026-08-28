@@ -5,6 +5,8 @@ public class SurveySectionDto
 {
     public Guid Id { get; init; }
 
+    public Guid SurveyId { get; set; }
+
     public string Title { get; init; } = null!;
 
     public string? Description { get; init; }

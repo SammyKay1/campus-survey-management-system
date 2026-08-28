@@ -20,7 +20,7 @@ public class SurveySection : Entity
     {
     }
 
-    public SurveySection( Guid surveyId,  string title, int displayOrder)
+    public SurveySection( Guid surveyId,  string title, int displayOrder, string? description = null)
     {
         if (surveyId == Guid.Empty)
             throw new ArgumentException( "Survey is required.");
@@ -33,7 +33,9 @@ public class SurveySection : Entity
 
         SurveyId = surveyId;
         Title = title.Trim();
+        Description = description?.Trim();
         DisplayOrder = displayOrder;
+        
     }
 
     public void AddQuestion( Question question)

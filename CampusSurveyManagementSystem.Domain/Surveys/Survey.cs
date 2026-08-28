@@ -20,8 +20,7 @@ public class Survey : AuditableEntity
 
     public bool IsAnonymous { get; private set; }
 
-    public IReadOnlyCollection<SurveySection> Sections =>
-        _sections.AsReadOnly();
+    public IReadOnlyCollection<SurveySection> Sections =>  _sections.AsReadOnly();
 
     private Survey()
     {
@@ -29,11 +28,7 @@ public class Survey : AuditableEntity
 
     public Survey(Guid organizationId,  string title,  string? description = null,   bool isAnonymous = false)
     {
-        if (organizationId == Guid.Empty)
-            throw new ArgumentException( "Organization is required.");
-
-        if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException( "Survey title is required.");
+        Validate(organizationId, title);
 
         OrganizationId = organizationId;
         Title = title.Trim();
@@ -46,11 +41,7 @@ public class Survey : AuditableEntity
 
     public void Update( string title, string? description)
     {
-        if (Status != SurveyStatus.Draft)
-            throw new InvalidOperationException( "Only draft surveys can be edited.");
-
-        if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException( "Survey title is required.");
+        Validate(Status, title);
 
         Title = title.Trim();
         Description = description?.Trim();
@@ -109,5 +100,23 @@ public class Survey : AuditableEntity
         _sections.Add(section);
 
         MarkUpdated();
+    }
+
+    private void Validate(Guid organizationId,  string title)
+    {
+        if (organizationId == Guid.Empty)
+            throw new ArgumentException( "Organization is required.");
+
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException( "Survey title is required.");   
+    }
+
+    private void Validate(SurveyStatus status, string title)
+    {
+        if (status != SurveyStatus.Draft)
+            throw new InvalidOperationException( "Only draft surveys can be edited.");
+
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException( "Survey title is required.");
     }
 }
