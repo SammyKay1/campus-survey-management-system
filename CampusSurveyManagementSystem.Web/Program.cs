@@ -9,6 +9,8 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using CampusSurveyManagementSystem.Application.Surveys.Interfaces;
 using CampusSurveyManagementSystem.Application.Surveys.Services;
+using System.Text.Json.Serialization;
+using CampusSurveyManagementSystem.Web.Infrastructure.ErrorHandling;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,13 +30,21 @@ builder.Services.AddScoped<IApplicationDbContext>( provider => provider.GetRequi
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<ISurveyService, SurveyService>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddProblemDetails();
+
 
 
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 
 builder.Services.AddOpenApi();
 
@@ -48,16 +58,22 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi(); // Exposes the OpenAPI JSON
     app.MapScalarApiReference(); // Exposes the Scalar UI
     
-    app.UseHsts();
+    //app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+//app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
+app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.MapControllers();
+
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+
 
 app.Run();  

@@ -24,7 +24,7 @@ public class OrganizationService : IOrganizationService
 
         if (organization is null)
         {
-            return Result<OrganizationDto>.Failure( "Organization was not found.");
+            return Result<OrganizationDto>.Failure( "Organization was not found.", ErrorType.NotFound);
         }
 
         return Result<OrganizationDto>.Success( MapToDto(organization));
@@ -35,12 +35,12 @@ public class OrganizationService : IOrganizationService
     {
         if (pageNumber < 1)
         {
-            return Result<PagedResult<OrganizationDto>>.Failure( "Page number must be greater than zero.");
+            return Result<PagedResult<OrganizationDto>>.Failure( "Page number must be greater than zero.", ErrorType.Validation);
         }
 
         if (pageSize < 1 || pageSize > 100)
         {
-            return Result<PagedResult<OrganizationDto>>.Failure( "Page size must be between 1 and 100.");
+            return Result<PagedResult<OrganizationDto>>.Failure( "Page size must be between 1 and 100.", ErrorType.Validation);
         }
 
         var query = _context.Organizations.AsNoTracking().OrderBy(x => x.Name);
@@ -68,7 +68,7 @@ public class OrganizationService : IOrganizationService
 
         if (codeExists)
         {
-            return Result<OrganizationDto>.Failure( "An organization with this code already exists.");
+            return Result<OrganizationDto>.Failure( "An organization with this code already exists.", ErrorType.Conflict);
         }
 
         var organization = new Domain.Organizations.Organization( request.Name,  request.Code,  request.Description);
@@ -89,16 +89,12 @@ public class OrganizationService : IOrganizationService
 
         if (organization is null)
         {
-            return Result.Failure(
-                "Organization was not found.");
+            return Result.Failure( "Organization was not found.", ErrorType.NotFound);
         }
 
-        organization.Update(
-            request.Name,
-            request.Description);
+        organization.Update( request.Name, request.Description);
 
-        await _context.SaveChangesAsync(
-            cancellationToken);
+        await _context.SaveChangesAsync( cancellationToken);
 
         return Result.Success();
     }
@@ -110,7 +106,7 @@ public class OrganizationService : IOrganizationService
 
         if (organization is null)
         {
-            return Result.Failure( "Organization was not found.");
+            return Result.Failure( "Organization was not found.",ErrorType.NotFound);
         }
 
         organization.Activate();
@@ -126,7 +122,7 @@ public class OrganizationService : IOrganizationService
 
         if (organization is null)
         {
-            return Result.Failure( "Organization was not found.");
+            return Result.Failure( "Organization was not found.",ErrorType.NotFound);
         }
 
         organization.Deactivate();

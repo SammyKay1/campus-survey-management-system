@@ -102,7 +102,7 @@ public class Survey : AuditableEntity
         MarkUpdated();
     }
 
-    private void Validate(Guid organizationId,  string title)
+    private static void Validate(Guid organizationId,  string title)
     {
         if (organizationId == Guid.Empty)
             throw new ArgumentException( "Organization is required.");
@@ -111,7 +111,7 @@ public class Survey : AuditableEntity
             throw new ArgumentException( "Survey title is required.");   
     }
 
-    private void Validate(SurveyStatus status, string title)
+    private static void Validate(SurveyStatus status, string title)
     {
         if (status != SurveyStatus.Draft)
             throw new InvalidOperationException( "Only draft surveys can be edited.");

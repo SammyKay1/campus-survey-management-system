@@ -2,6 +2,7 @@
 using CampusSurveyManagementSystem.Application.Common.Models;
 using CampusSurveyManagementSystem.Application.Organizations.DTOs;
 using CampusSurveyManagementSystem.Application.Organizations.Interfaces;
+using CampusSurveyManagementSystem.Web.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusSurveyManagementSystem.Web.Controllers;
@@ -23,12 +24,7 @@ public class OrganizationsController : ControllerBase
     {
         var result = await _organizationService.GetAllAsync( pageNumber, pageSize,  cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        return Ok(result.Value);
+        return result.ToActionResult(this);
     }
 
     [HttpGet("{id:guid}")]
@@ -36,12 +32,7 @@ public class OrganizationsController : ControllerBase
     {
         var result = await _organizationService.GetByIdAsync(id,  cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return NotFound(result.Errors);
-        }
-
-        return Ok(result.Value);
+        return result.ToActionResult(this);
     }
 
     [HttpPost]

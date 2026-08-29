@@ -21,7 +21,7 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpGet]
-    public async Task<IActionResult> GetAll( [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20,
+    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
         var result = await _surveyService.GetAllAsync(pageNumber, pageSize, cancellationToken);
@@ -40,9 +40,9 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id,  CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.GetByIdAsync( id, cancellationToken);
+        var result = await _surveyService.GetByIdAsync(id, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -58,16 +58,16 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPost]
-    public async Task<IActionResult> Create( [FromBody] CreateSurveyRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Create([FromBody] CreateSurveyRequest request, CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.CreateAsync( request,  cancellationToken);
+        var result = await _surveyService.CreateAsync(request, cancellationToken);
 
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id },   result.Value);
+        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
     }
 
 
@@ -76,9 +76,9 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id,[FromBody] UpdateSurveyRequest request,  CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSurveyRequest request, CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.UpdateAsync( id, request,  cancellationToken);
+        var result = await _surveyService.UpdateAsync(id, request, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -94,10 +94,10 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPost("{surveyId:guid}/sections")]
-    public async Task<IActionResult> AddSection(Guid surveyId,  [FromBody] CreateSectionRequest request,
+    public async Task<IActionResult> AddSection(Guid surveyId, [FromBody] CreateSectionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.AddSectionAsync(surveyId, request,   cancellationToken);
+        var result = await _surveyService.AddSectionAsync(surveyId, request, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -113,10 +113,10 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPost("sections/{sectionId:guid}/questions")]
-    public async Task<IActionResult> AddQuestion( Guid sectionId, [FromBody] CreateQuestionRequest request,
+    public async Task<IActionResult> AddQuestion(Guid sectionId, [FromBody] CreateQuestionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.AddQuestionAsync( sectionId, request,  cancellationToken);
+        var result = await _surveyService.AddQuestionAsync(sectionId, request, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -132,10 +132,10 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPost("questions/{questionId:guid}/options")]
-    public async Task<IActionResult> AddQuestionOption(  Guid questionId,   [FromBody] CreateQuestionOptionRequest request,
+    public async Task<IActionResult> AddQuestionOption(Guid questionId, [FromBody] CreateQuestionOptionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.AddQuestionOptionAsync( questionId, request, cancellationToken);
+        var result = await _surveyService.AddQuestionOptionAsync(questionId, request, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -154,7 +154,7 @@ public class SurveysController : ControllerBase
     public async Task<IActionResult> Schedule(Guid id, [FromBody] ScheduleSurveyRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.ScheduleAsync(id, request.StartDate,  request.EndDate,
+        var result = await _surveyService.ScheduleAsync(id, request.StartDate, request.EndDate,
             cancellationToken);
 
         if (!result.Succeeded)
@@ -171,7 +171,7 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPatch("{id:guid}/publish")]
-    public async Task<IActionResult> Publish(Guid id,  CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Publish(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await _surveyService.PublishAsync(id, cancellationToken);
 
@@ -191,7 +191,7 @@ public class SurveysController : ControllerBase
     [HttpPatch("{id:guid}/close")]
     public async Task<IActionResult> Close(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.CloseAsync( id,  cancellationToken);
+        var result = await _surveyService.CloseAsync(id, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -207,9 +207,9 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPatch("{id:guid}/archive")]
-    public async Task<IActionResult> Archive( Guid id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Archive(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await _surveyService.ArchiveAsync( id, cancellationToken);
+        var result = await _surveyService.ArchiveAsync(id, cancellationToken);
 
         if (!result.Succeeded)
         {
@@ -218,4 +218,79 @@ public class SurveysController : ControllerBase
 
         return NoContent();
     }
+
+
+    /// <summary>
+    /// Survey Response Controller
+    /// </summary>
+    /// <param name="surveyId"></param>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// 
+    [HttpPost("{surveyId:guid}/responses")]
+    public async Task<IActionResult> StartResponse(Guid surveyId, [FromBody] StartResponseRequest request,
+    CancellationToken cancellationToken = default)
+    {
+        var result = await _surveyService.StartResponseAsync(surveyId, request, cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(result.Value);
+    }
+
+
+
+    [HttpPost("{surveyId:guid}/responses/{responseId:guid}/answers")]
+    public async Task<IActionResult> AddAnswer(Guid surveyId, Guid responseId, [FromBody] AddAnswerRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _surveyService.AddAnswerAsync(surveyId, responseId, request, cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(result.Value);
+    }
+
+
+    [HttpPost("{surveyId:guid}/responses/{responseId:guid}/submit")]
+    public async Task<IActionResult> SubmitResponse(Guid surveyId, Guid responseId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _surveyService.SubmitResponseAsync(
+            surveyId,
+            responseId,
+            cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(result.Value);
+    }
+
+
+    [HttpGet("{surveyId:guid}/responses/{responseId:guid}")]
+    public async Task<IActionResult> GetResponse(Guid surveyId, Guid responseId,
+    CancellationToken cancellationToken = default)
+    {
+        var result = await _surveyService.GetResponseAsync( surveyId, responseId,  cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return NotFound(result.Errors);
+        }
+
+        return Ok(result.Value);
+    }
+
+
+
 }

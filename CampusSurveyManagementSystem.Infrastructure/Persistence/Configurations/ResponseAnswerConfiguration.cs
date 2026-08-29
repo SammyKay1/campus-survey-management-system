@@ -20,7 +20,7 @@ public class ResponseAnswerConfiguration  : IEntityTypeConfiguration<ResponseAns
             .IsRequired();
 
         builder.Property(x => x.TextValue)
-            .HasMaxLength(4000);
+            .HasMaxLength(5000);
 
         builder.Property(x => x.NumericValue)
             .HasPrecision(18, 4);
@@ -34,8 +34,7 @@ public class ResponseAnswerConfiguration  : IEntityTypeConfiguration<ResponseAns
         {
             x.SurveyResponseId,
             x.QuestionId
-        })
-        .IsUnique();
+        }).IsUnique();
 
         // Response → Answers
         builder.HasOne<SurveyResponse>()

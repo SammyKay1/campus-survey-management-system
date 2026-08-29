@@ -44,6 +44,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<ResponseAnswer> ResponseAnswers => Set<ResponseAnswer>();
 
+    public DbSet<ResponseAnswerOption> ResponseAnswerOptions => Set<ResponseAnswerOption>();
+
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
 

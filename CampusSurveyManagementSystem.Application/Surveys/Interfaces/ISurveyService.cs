@@ -27,4 +27,19 @@ public interface ISurveyService
     Task<Result> CloseAsync(  Guid surveyId,  CancellationToken cancellationToken = default);
 
     Task<Result> ArchiveAsync(  Guid surveyId,    CancellationToken cancellationToken = default);
+
+
+    Task<Result<SurveyResponseDto>> StartResponseAsync( Guid surveyId,  StartResponseRequest request,
+    CancellationToken cancellationToken = default);
+
+    Task<Result<ResponseAnswerDto>> AddAnswerAsync( Guid surveyId, Guid responseId, AddAnswerRequest request,
+    CancellationToken cancellationToken = default);
+
+    Task<Result<SubmitResponseDto>> SubmitResponseAsync( Guid surveyId, Guid responseId,  CancellationToken cancellationToken = default);
+
+    Task<Result<SurveyResponseDetailsDto>> GetResponseAsync( Guid surveyId,  Guid responseId,  CancellationToken cancellationToken = default);
+
+
+
+
 }
