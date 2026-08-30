@@ -6,69 +6,66 @@ namespace CampusSurveyManagementSystem.Web.Common;
 
 public static class ResultExtensions
 {
-    public static IActionResult ToActionResult( this Result result,    ControllerBase controller)
+    public static IActionResult ToActionResult(this Result result, ControllerBase controller)
     {
         if (result.Succeeded)
         {
-            return controller.Ok();
+            return controller.NoContent();
         }
 
-        return CreateErrorResult( controller,  result.ErrorType,  result.Errors);
+        return CreateProblemDetails(controller, result);
     }
 
-    public static IActionResult ToActionResult<T>(this Result<T> result,  ControllerBase controller)
+    public static IActionResult ToActionResult<T>(this Result<T> result, ControllerBase controller)
     {
         if (result.Succeeded)
         {
             return controller.Ok(result.Value);
         }
 
-        return CreateErrorResult( controller,  result.ErrorType,  result.Errors);
+        return CreateProblemDetails(controller, result);
     }
 
-    private static IActionResult CreateErrorResult( ControllerBase controller,  ErrorType? errorType, string? error)
+    private static IActionResult CreateProblemDetails(ControllerBase controller, Result result)
     {
-        var statusCode = errorType switch
+        var statusCode = result.ErrorType switch
         {
-            ErrorType.NotFound =>  StatusCodes.Status404NotFound,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
 
-            ErrorType.Conflict =>  StatusCodes.Status409Conflict,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
 
-            ErrorType.Unauthorized =>  StatusCodes.Status401Unauthorized,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
 
-            ErrorType.Forbidden =>  StatusCodes.Status403Forbidden,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
 
             ErrorType.Validation => StatusCodes.Status400BadRequest,
 
-            _ =>   StatusCodes.Status400BadRequest
+            _ => StatusCodes.Status400BadRequest
         };
 
-        return new ObjectResult(new ProblemDetails
+        var title = result.ErrorType switch
+        {
+            ErrorType.NotFound => "Resource not found.",
+
+            ErrorType.Conflict => "Conflict.",
+
+            ErrorType.Unauthorized => "Unauthorized.",
+
+            ErrorType.Forbidden => "Forbidden.",
+
+            ErrorType.Validation => "Validation failed.",
+
+            _ => "Request failed."
+        };
+
+        var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = GetTitle(statusCode),
-            Detail = error
-        })
-        {
-            StatusCode = statusCode
+            Title = title,
+            Detail = string.Join( " ",  result.Errors), 
+            Instance = controller.HttpContext.Request.Path
         };
-    }
 
-    private static string GetTitle(int statusCode)
-    {
-        return statusCode switch
-        {
-            StatusCodes.Status400BadRequest =>   "Validation failed.",
-
-            StatusCodes.Status401Unauthorized =>  "Authentication required.",
-
-            StatusCodes.Status403Forbidden =>   "Access denied.",
-
-            StatusCodes.Status404NotFound =>  "Resource not found.",
-
-            StatusCodes.Status409Conflict =>  "Request conflicts with the current state.",
-
-            _ =>  "Request failed."
-        };
+        return controller.StatusCode( statusCode,   problemDetails);
     }
 }

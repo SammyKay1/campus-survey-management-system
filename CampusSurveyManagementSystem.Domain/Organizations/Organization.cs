@@ -1,3 +1,4 @@
+
 using CampusSurveyManagementSystem.Domain.Common;
 
 namespace CampusSurveyManagementSystem.Domain.Organizations;
@@ -40,6 +41,7 @@ public class Organization : AuditableEntity
       {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException( "Organization name is required.");
+            
 
         Name = name.Trim();
         Description = description?.Trim();

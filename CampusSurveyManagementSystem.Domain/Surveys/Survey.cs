@@ -20,13 +20,13 @@ public class Survey : AuditableEntity
 
     public bool IsAnonymous { get; private set; }
 
-    public IReadOnlyCollection<SurveySection> Sections =>  _sections.AsReadOnly();
+    public IReadOnlyCollection<SurveySection> Sections => _sections.AsReadOnly();
 
     private Survey()
     {
     }
 
-    public Survey(Guid organizationId,  string title,  string? description = null,   bool isAnonymous = false)
+    public Survey(Guid organizationId, string title, string? description = null, bool isAnonymous = false)
     {
         Validate(organizationId, title);
 
@@ -39,7 +39,7 @@ public class Survey : AuditableEntity
         IsAnonymous = isAnonymous;
     }
 
-    public void Update( string title, string? description)
+    public void Update(string title, string? description)
     {
         Validate(Status, title);
 
@@ -52,10 +52,15 @@ public class Survey : AuditableEntity
     public void Publish()
     {
         if (!_sections.Any())
-            throw new InvalidOperationException( "A survey must contain at least one section.");
+            throw new DomainException("A survey must contain at least one section.");
 
         if (_sections.All(s => !s.Questions.Any()))
-            throw new InvalidOperationException("A survey must contain at least one question.");
+            throw new DomainException("A survey must contain at least one question.");
+
+        if (Status != SurveyStatus.Draft)
+        {
+            throw new DomainException( "Only draft surveys can be published.");
+        }
 
         Status = SurveyStatus.Published;
 
@@ -65,7 +70,7 @@ public class Survey : AuditableEntity
     public void Close()
     {
         if (Status != SurveyStatus.Published)
-            throw new InvalidOperationException( "Only published surveys can be closed.");
+            throw new DomainException("Only published surveys can be closed.");
 
         Status = SurveyStatus.Closed;
 
@@ -81,9 +86,9 @@ public class Survey : AuditableEntity
 
     public void Schedule(DateTime startDate, DateTime? endDate)
     {
-        if (endDate.HasValue &&     endDate.Value <= startDate)
+        if (endDate.HasValue && endDate.Value <= startDate)
         {
-            throw new ArgumentException( "End date must be after start date.");
+            throw new DomainException("End date must be after start date.");
         }
 
         StartDate = startDate;
@@ -92,31 +97,31 @@ public class Survey : AuditableEntity
         MarkUpdated();
     }
 
-    public void AddSection(  SurveySection section)
+    public void AddSection(SurveySection section)
     {
         if (Status != SurveyStatus.Draft)
-            throw new InvalidOperationException( "Sections cannot be added after publication.");
+            throw new DomainException("Sections cannot be added after publication.");
 
         _sections.Add(section);
 
         MarkUpdated();
     }
 
-    private static void Validate(Guid organizationId,  string title)
+    private static void Validate(Guid organizationId, string title)
     {
         if (organizationId == Guid.Empty)
-            throw new ArgumentException( "Organization is required.");
+            throw new ArgumentException("Organization is required.");
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException( "Survey title is required.");   
+            throw new ArgumentException("Survey title is required.");
     }
 
     private static void Validate(SurveyStatus status, string title)
     {
         if (status != SurveyStatus.Draft)
-            throw new InvalidOperationException( "Only draft surveys can be edited.");
+            throw new DomainException("Only draft surveys can be edited.");
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException( "Survey title is required.");
+            throw new ArgumentException("Survey title is required.");
     }
 }

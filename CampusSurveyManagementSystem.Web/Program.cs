@@ -31,7 +31,6 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<ISurveyService, SurveyService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
 builder.Services.AddProblemDetails();
 
 
@@ -70,8 +69,10 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 
+//
 app.MapControllers();
 
+//
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 

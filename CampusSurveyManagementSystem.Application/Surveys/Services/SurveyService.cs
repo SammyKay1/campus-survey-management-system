@@ -98,6 +98,7 @@ public class SurveyService : ISurveyService
         {
             return Result<SurveyDto>.Failure("Organization was not found.", ErrorType.NotFound);
         }
+        
 
         var survey = new Survey(request.OrganizationId, request.Title, request.Description,
             request.IsAnonymous);
@@ -252,6 +253,7 @@ public class SurveyService : ISurveyService
         {
             return Result.Failure("Survey was not found.", ErrorType.NotFound);
         }
+
 
         survey.Publish();
 
@@ -508,7 +510,7 @@ public class SurveyService : ISurveyService
 
                 if (!singleOptionExists)
                 {
-                    return Result<ResponseAnswerDto>.Failure("The selected option does not belong to this question.", ErrorType.Conflict);
+                    return Result<ResponseAnswerDto>.Failure("The selected option does not belong to this question.", ErrorType.Validation);
                 }
 
                 answer = new ResponseAnswer(responseId, question.Id, selectedOptionId: request.SelectedOptionId);
@@ -539,7 +541,7 @@ public class SurveyService : ISurveyService
 
                 if (validOptionCount != distinctOptionIds.Count)
                 {
-                    return Result<ResponseAnswerDto>.Failure("One or more selected options do not belong to this question.", ErrorType.Conflict);
+                    return Result<ResponseAnswerDto>.Failure("One or more selected options do not belong to this question.", ErrorType.Validation);
                 }
 
                 answer = new ResponseAnswer(responseId, question.Id);
@@ -668,8 +670,7 @@ public class SurveyService : ISurveyService
         // Validate every answer.
         foreach (var answer in answers)
         {
-            var question = questions.FirstOrDefault(
-                x => x.Id == answer.QuestionId);
+            var question = questions.FirstOrDefault( x => x.Id == answer.QuestionId);
 
             if (question is null)
             {
@@ -734,7 +735,7 @@ public class SurveyService : ISurveyService
                     if (validOptionCount != selectedOptionIds.Count)
                     {
                         return Result<SubmitResponseDto>.Failure(
-                            $"One or more options are invalid for question '{question.Text}'.", ErrorType.Forbidden);
+                            $"One or more options are invalid for question '{question.Text}'.", ErrorType.Validation);
                     }
 
                     break;
@@ -743,7 +744,7 @@ public class SurveyService : ISurveyService
                 default:
 
                     return Result<SubmitResponseDto>.Failure(
-                        $"Question '{question.Text}' has an unsupported question type.", ErrorType.Forbidden);
+                        $"Question '{question.Text}' has an unsupported question type.", ErrorType.Validation);
             }
         }
 

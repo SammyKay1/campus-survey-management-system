@@ -64,6 +64,18 @@ public class OrganizationService : IOrganizationService
 
     public async Task<Result<OrganizationDto>> CreateAsync( CreateOrganizationRequest request, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return Result<OrganizationDto>.Failure("Organization name is required", ErrorType.Validation);
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Code))
+        {
+            return Result<OrganizationDto>.Failure("Organization code is required", ErrorType.Validation);
+        }
+
+        var code = request.Code.Trim().ToUpperInvariant();
+
         var codeExists = await _context.Organizations.AnyAsync( x => x.Code == request.Code, cancellationToken);
 
         if (codeExists)
@@ -71,7 +83,7 @@ public class OrganizationService : IOrganizationService
             return Result<OrganizationDto>.Failure( "An organization with this code already exists.", ErrorType.Conflict);
         }
 
-        var organization = new Domain.Organizations.Organization( request.Name,  request.Code,  request.Description);
+        var organization = new Organization( request.Name,  request.Code,  request.Description);
 
         _context.Organizations.Add(organization);
 

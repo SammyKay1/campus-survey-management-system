@@ -42,7 +42,7 @@ public class OrganizationsController : ControllerBase
 
         if (!result.Succeeded)
         {
-            return BadRequest(result.Errors);
+            return result.ToActionResult(this);
         }
 
         return CreatedAtAction( nameof(GetById),  new { id = result.Value!.Id },  result.Value);
@@ -54,12 +54,7 @@ public class OrganizationsController : ControllerBase
     {
         var result = await _organizationService.UpdateAsync(id,  request,  cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return NotFound(result.Errors);
-        }
-
-        return NoContent();
+        return result.ToActionResult(this);
     }
 
     [HttpPatch("{id:guid}/activate")]
@@ -67,12 +62,7 @@ public class OrganizationsController : ControllerBase
     {
         var result = await _organizationService.ActivateAsync( id,    cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return NotFound(result.Errors);
-        }
-
-        return NoContent();
+        return result.ToActionResult(this);
     }
 
     [HttpPatch("{id:guid}/deactivate")]
@@ -80,11 +70,6 @@ public class OrganizationsController : ControllerBase
     {
         var result = await _organizationService.DeactivateAsync( id,  cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return NotFound(result.Errors);
-        }
-
-        return NoContent();
+        return result.ToActionResult(this);
     }
 }

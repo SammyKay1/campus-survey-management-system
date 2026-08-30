@@ -3,27 +3,28 @@ namespace CampusSurveyManagementSystem.Application.Common.Models;
 
 public class Result
 {
-    public bool Succeeded { get; }
+    public bool Succeeded { get; protected set; }
 
-    public string? Errors { get; }
+    public List<string> Errors { get; protected set; } = new();
 
-    public ErrorType? ErrorType { get; }
-
-    protected Result(  bool succeeded,  string? error = null,  ErrorType? errorType = null)
-    {
-        Succeeded = succeeded;
-        Errors = error;
-        ErrorType = errorType;
-    }
+    public ErrorType? ErrorType { get; protected set; }
 
     public static Result Success()
     {
-        return new Result(true);
+        return new Result
+        {
+            Succeeded = true
+        };
     }
 
-    public static Result Failure(string error,  ErrorType? errorType = Models.ErrorType.Validation)
+    public static Result Failure(string error,  ErrorType errorType = Models.ErrorType.Validation)
     {
-        return new Result( false, error,  errorType);
+        return new Result
+        {
+            Succeeded = false,
+            ErrorType = errorType,
+            Errors = new List<string> { error }
+        };
     }
 }
 
@@ -32,20 +33,24 @@ public class Result
 
 public class Result<T> : Result
 {
-    public T? Value { get; }
-
-    private Result( bool succeeded, T? value,  string? error,    ErrorType? errorType)   : base(succeeded, error, errorType)
-    {
-        Value = value;
-    }
+    public T? Value { get; private set; }
 
     public static Result<T> Success(T value)
     {
-        return new Result<T>(  true,    value,  null,  null);
+        return new Result<T>
+        {
+            Succeeded = true,
+            Value = value
+        };
     }
 
-    public static Result<T> Failure(  string error,  ErrorType errorType = Models.ErrorType.Validation)
+    public static Result<T> Failure(string error,    ErrorType errorType = Models.ErrorType.Validation)
     {
-        return new Result<T>(false, default,  error,  errorType);
+        return new Result<T>
+        {
+            Succeeded = false,
+            ErrorType = errorType,
+            Errors = new List<string> { error }
+        };
     }
 }

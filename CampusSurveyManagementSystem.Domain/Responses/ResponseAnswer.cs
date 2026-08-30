@@ -18,8 +18,7 @@ public class ResponseAnswer : Entity
 
     public Guid? SelectedOptionId { get; private set; }
 
-    public IReadOnlyCollection<ResponseAnswerOption> SelectedOptions =>
-        _selectedOptions.AsReadOnly();
+    public IReadOnlyCollection<ResponseAnswerOption> SelectedOptions =>    _selectedOptions.AsReadOnly();
 
     private ResponseAnswer()
     {
