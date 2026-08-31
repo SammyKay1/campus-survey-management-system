@@ -4,25 +4,22 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CampusSurveyManagementSystem.Infrastructure.Persistence.Configurations;
 
-public class OrganizationMembershipConfiguration
-    : IEntityTypeConfiguration<OrganizationMembership>
+public class OrganizationMembershipConfiguration  : IEntityTypeConfiguration<OrganizationMembership>
 {
-    public void Configure(
-        EntityTypeBuilder<OrganizationMembership> builder)
+    public void Configure(EntityTypeBuilder<OrganizationMembership> builder)
     {
         builder.ToTable("OrganizationMemberships");
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.UserId)
-            .IsRequired();
-
         builder.Property(x => x.OrganizationId)
             .IsRequired();
 
+        builder.Property(x => x.UserId)
+            .IsRequired();
+
         builder.Property(x => x.Role)
-            .IsRequired()
-            .HasConversion<int>();
+            .IsRequired();
 
         builder.Property(x => x.IsActive)
             .IsRequired();
@@ -30,8 +27,7 @@ public class OrganizationMembershipConfiguration
         builder.Property(x => x.JoinedAt)
             .IsRequired();
 
-        // One user can have only one membership
-        // in a particular organization.
+        // A user can belong to an organization only once.
         builder.HasIndex(x => new
         {
             x.OrganizationId,
@@ -39,7 +35,10 @@ public class OrganizationMembershipConfiguration
         })
         .IsUnique();
 
-        // Organization → Membership
-        //builder.HasOne<Organization>() .WithMany(x => x.Memberships) .HasForeignKey(x => x.OrganizationId) .OnDelete(DeleteBehavior.Cascade);
+        // Organization → Memberships
+        builder.HasOne<Organization>()
+            .WithMany(x => x.Memberships)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

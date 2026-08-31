@@ -5,7 +5,7 @@ namespace CampusSurveyManagementSystem.Domain.Organizations;
 
 public class Organization : AuditableEntity
 {
-    //private readonly List<OrganizationMembership> _memberships = new();
+    private readonly List<OrganizationMembership> _memberships = new();
 
     private readonly List<Guid> _surveyIds = new();
 
@@ -17,7 +17,7 @@ public class Organization : AuditableEntity
 
     public bool IsActive { get; private set; }
 
-    public IReadOnlyCollection<OrganizationMembership>? Memberships { get; private set; }
+    public IReadOnlyCollection<OrganizationMembership>? Memberships => _memberships.AsReadOnly();
 
     private Organization()
     {

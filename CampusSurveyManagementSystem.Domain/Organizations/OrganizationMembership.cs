@@ -18,7 +18,7 @@ public class OrganizationMembership : Entity
     {
     }
 
-    public OrganizationMembership(   Guid organizationId,  Guid userId,  OrganizationRole role)
+    public OrganizationMembership(Guid organizationId,  Guid userId,  OrganizationRole role)
     {
         if (organizationId == Guid.Empty)
             throw new ArgumentException( "Organization is required.");

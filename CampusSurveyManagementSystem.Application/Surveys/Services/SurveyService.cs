@@ -98,7 +98,7 @@ public class SurveyService : ISurveyService
         {
             return Result<SurveyDto>.Failure("Organization was not found.", ErrorType.NotFound);
         }
-        
+
 
         var survey = new Survey(request.OrganizationId, request.Title, request.Description,
             request.IsAnonymous);
@@ -670,7 +670,7 @@ public class SurveyService : ISurveyService
         // Validate every answer.
         foreach (var answer in answers)
         {
-            var question = questions.FirstOrDefault( x => x.Id == answer.QuestionId);
+            var question = questions.FirstOrDefault(x => x.Id == answer.QuestionId);
 
             if (question is null)
             {
@@ -782,7 +782,7 @@ public class SurveyService : ISurveyService
 
         if (survey is null)
         {
-            return Result<SurveyResponseDetailsDto>.Failure( "Survey was not found.", ErrorType.NotFound);
+            return Result<SurveyResponseDetailsDto>.Failure("Survey was not found.", ErrorType.NotFound);
         }
 
         var response = await _context.SurveyResponses
@@ -794,7 +794,7 @@ public class SurveyService : ISurveyService
 
         if (response is null)
         {
-            return Result<SurveyResponseDetailsDto>.Failure( "Survey response was not found.", ErrorType.NotFound);
+            return Result<SurveyResponseDetailsDto>.Failure("Survey response was not found.", ErrorType.NotFound);
         }
 
         var questions = await _context.Questions
@@ -827,7 +827,7 @@ public class SurveyService : ISurveyService
 
         var questionDtos = questions.Select(question =>
             {
-                var answer = answers.FirstOrDefault(  x => x.QuestionId == question.Id);
+                var answer = answers.FirstOrDefault(x => x.QuestionId == question.Id);
 
                 var questionOptions = options
                     .Where(x => x.QuestionId == question.Id)
@@ -847,7 +847,7 @@ public class SurveyService : ISurveyService
                     IsRequired = question.IsRequired,
                     DisplayOrder = question.DisplayOrder,
                     Options = questionOptions,
-                    Answer = answer is null ? null   : MapToDto(answer)
+                    Answer = answer is null ? null : MapToDto(answer)
                 };
             })
             .ToArray();
@@ -865,6 +865,81 @@ public class SurveyService : ISurveyService
         return Result<SurveyResponseDetailsDto>.Success(result);
     }
 
+
+
+    /// <summary>
+    /// Retrieve resource for Resource based authorization
+    /// </summary>
+    /// <param name="surveyId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<Result<Survey>> GetAuthorizationResourceAsync(Guid surveyId, CancellationToken cancellationToken = default)
+    {
+        var survey = await _context.Surveys.FirstOrDefaultAsync(x => x.Id == surveyId, cancellationToken);
+
+        if (survey is null)
+        {
+            return Result<Survey>.Failure("Survey was not found.", ErrorType.NotFound);
+        }
+
+        return Result<Survey>.Success(survey);
+    }
+
+
+
+    public async Task<Result<Survey>> GetSectionAuthorizationResourceAsync(Guid sectionId,
+    CancellationToken cancellationToken = default)
+    {
+        var section = await _context.SurveySections.AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == sectionId, cancellationToken);
+
+        if (section is null)
+        {
+            return Result<Survey>.Failure("Survey section was not found.", ErrorType.NotFound);
+        }
+
+        var survey = await _context.Surveys.FirstOrDefaultAsync(x => x.Id == section.SurveyId, cancellationToken);
+
+        if (survey is null)
+        {
+            return Result<Survey>.Failure("Survey was not found.", ErrorType.NotFound);
+        }
+
+        return Result<Survey>.Success(survey);
+    }
+
+
+    public async Task<Result<Survey>> GetQuestionAuthorizationResourceAsync( Guid questionId,  CancellationToken cancellationToken = default)
+    {
+        var question = await _context.Questions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                x => x.Id == questionId,
+                cancellationToken);
+
+        if (question is null)
+        {
+            return Result<Survey>.Failure("Question was not found.", ErrorType.NotFound);
+        }
+
+        var section = await _context.SurveySections
+            .AsNoTracking()
+            .FirstOrDefaultAsync(  x => x.Id == question.SurveySectionId, cancellationToken);
+
+        if (section is null)
+        {
+            return Result<Survey>.Failure( "Survey section was not found.", ErrorType.NotFound);
+        }
+
+        var survey = await _context.Surveys.FirstOrDefaultAsync( x => x.Id == section.SurveyId,  cancellationToken);
+
+        if (survey is null)
+        {
+            return Result<Survey>.Failure("Survey was not found.",  ErrorType.NotFound);
+        }
+
+        return Result<Survey>.Success(survey);
+    }
 
 
 }

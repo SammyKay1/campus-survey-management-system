@@ -2,7 +2,7 @@ using CampusSurveyManagementSystem.Domain.Common;
 
 namespace CampusSurveyManagementSystem.Domain.Surveys;
 
-public class Survey : AuditableEntity
+public class Survey : AuditableEntity, IOrganizationResource
 {
     private readonly List<SurveySection> _sections = new();
 

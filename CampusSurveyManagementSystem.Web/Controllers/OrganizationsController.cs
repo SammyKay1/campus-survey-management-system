@@ -1,14 +1,18 @@
 
+using CampusSurveyManagementSystem.Application.Common.Authorization;
 using CampusSurveyManagementSystem.Application.Common.Models;
+using CampusSurveyManagementSystem.Application.Identity.Constants;
 using CampusSurveyManagementSystem.Application.Organizations.DTOs;
 using CampusSurveyManagementSystem.Application.Organizations.Interfaces;
 using CampusSurveyManagementSystem.Web.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampusSurveyManagementSystem.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize (Policy = Policies.CanManageOrganizations)]
 public class OrganizationsController : ControllerBase
 {
     private readonly IOrganizationService _organizationService;
@@ -34,6 +38,8 @@ public class OrganizationsController : ControllerBase
 
         return result.ToActionResult(this);
     }
+
+
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request,  CancellationToken cancellationToken = default)

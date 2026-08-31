@@ -1,5 +1,6 @@
 using CampusSurveyManagementSystem.Application.Common.Models;
 using CampusSurveyManagementSystem.Application.Surveys.DTOs;
+using CampusSurveyManagementSystem.Domain.Surveys;
 
 namespace CampusSurveyManagementSystem.Application.Surveys.Interfaces;
 
@@ -38,6 +39,15 @@ public interface ISurveyService
     Task<Result<SubmitResponseDto>> SubmitResponseAsync( Guid surveyId, Guid responseId,  CancellationToken cancellationToken = default);
 
     Task<Result<SurveyResponseDetailsDto>> GetResponseAsync( Guid surveyId,  Guid responseId,  CancellationToken cancellationToken = default);
+
+    Task<Result<Survey>> GetAuthorizationResourceAsync(Guid surveyId, CancellationToken cancellationToken = default);
+
+    Task<Result<Survey>> GetSectionAuthorizationResourceAsync( Guid sectionId,  CancellationToken cancellationToken = default);
+
+    Task<Result<Survey>> GetQuestionAuthorizationResourceAsync( Guid questionId, CancellationToken cancellationToken = default);
+
+
+
 
 
 
