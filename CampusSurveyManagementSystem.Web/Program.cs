@@ -17,13 +17,13 @@ using CampusSurveyManagementSystem.Application.Identity.Interfaces;
 using CampusSurveyManagementSystem.Application.Common.Authorization;
 using CampusSurveyManagementSystem.Application.Identity.Constants;
 using Microsoft.AspNetCore.Authorization;
-using CampusSurveyManagementSystem.Application.Authorization;
 using CampusSurveyManagementSystem.Infrastructure.Organizations;
 using CampusSurveyManagementSystem.Web.Authorization.Handlers;
 using CampusSurveyManagementSystem.Web.Authorization.Requirements;
 using System.Net;
 using CampusSurveyManagementSystem.Web.Authorization;
 using CampusSurveyManagementSystem.Domain.Organizations;
+using CampusSurveyManagementSystem.Web.Services;
 
 
 
@@ -82,6 +82,23 @@ builder.Services.AddAuthorization(options =>
         });
 
     options.AddPolicy(
+    AuthorizationPolicies.ResponseOwner,  policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddRequirements( new ResponseOwnerRequirement());
+    });
+
+    options.AddPolicy(
+    AuthorizationPolicies.ResponseAccess,
+    policy =>
+    {
+        policy.RequireAuthenticatedUser();
+
+        policy.AddRequirements(
+            new ResponseAccessRequirement());
+    });
+
+    options.AddPolicy(
         AuthorizationPolicies.ViewSurvey,
         policy =>
         {
@@ -131,12 +148,14 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
 builder.Services.AddScoped<IAuthorizationHandler, OrganizationAccessHandler>();
 builder.Services.AddScoped<IAuthorizationHandler,  OrganizationResourceAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ResponseOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ResponseAccessAuthorizationHandler>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 
-
-
-
-builder.Services.AddIdentityCore<ApplicationUser>(options =>
+/*builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.User.RequireUniqueEmail = true;
 
@@ -148,7 +167,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager();
+    .AddSignInManager(); */
 
 
 builder.Services.ConfigureApplicationCookie(options =>

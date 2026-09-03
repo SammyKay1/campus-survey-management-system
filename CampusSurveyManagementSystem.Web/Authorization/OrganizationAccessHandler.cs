@@ -3,7 +3,7 @@ using CampusSurveyManagementSystem.Application.Organizations.Interfaces;
 using CampusSurveyManagementSystem.Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CampusSurveyManagementSystem.Application.Authorization;
+namespace CampusSurveyManagementSystem.Web.Authorization;
 
 public class OrganizationAccessHandler : AuthorizationHandler<OrganizationAccessRequirement, IOrganizationResource>
 {

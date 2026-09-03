@@ -3,6 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CampusSurveyManagementSystem.Web.Authorization;
 
-public class OrganizationAccessRequirement : IAuthorizationRequirement
+public sealed class ResponseAccessRequirement : IAuthorizationRequirement
 {
 }

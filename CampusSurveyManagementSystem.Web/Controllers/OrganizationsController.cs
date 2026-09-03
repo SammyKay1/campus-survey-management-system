@@ -12,7 +12,7 @@ namespace CampusSurveyManagementSystem.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize (Policy = Policies.CanManageOrganizations)]
+[Authorize]
 public class OrganizationsController : ControllerBase
 {
     private readonly IOrganizationService _organizationService;

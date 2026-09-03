@@ -12,4 +12,8 @@ public static class AuthorizationPolicies
     public const string ViewResponses = "ViewResponses";
 
     public const string ExportResponses = "ExportResponses";
+
+    public const string ResponseOwner = "ResponseOwner";
+
+    public const string ResponseAccess = "ResponseAccess";
 }

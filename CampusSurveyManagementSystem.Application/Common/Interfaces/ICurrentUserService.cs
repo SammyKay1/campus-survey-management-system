@@ -1,7 +1,7 @@
 
 namespace CampusSurveyManagementSystem.Application.Common.Interfaces;
 
-public interface ICurrentUser
+public interface ICurrentUserService
 {
     Guid? UserId { get; }
 

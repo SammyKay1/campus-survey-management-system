@@ -76,7 +76,7 @@ public class OrganizationService : IOrganizationService
 
         var code = request.Code.Trim().ToUpperInvariant();
 
-        var codeExists = await _context.Organizations.AnyAsync( x => x.Code == request.Code, cancellationToken);
+        var codeExists = await _context.Organizations.AnyAsync( x => x.Code == code, cancellationToken);
 
         if (codeExists)
         {

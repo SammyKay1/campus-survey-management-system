@@ -13,9 +13,12 @@ public class SurveyService : ISurveyService
 {
     private readonly IApplicationDbContext _context;
 
-    public SurveyService(IApplicationDbContext context)
+    private readonly ICurrentUserService _currentUser;
+
+    public SurveyService(IApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUser = currentUserService;
     }
 
     // ============================================================
@@ -396,7 +399,8 @@ public class SurveyService : ISurveyService
             return Result<SurveyResponseDto>.Failure("Only published surveys can accept responses.", ErrorType.Conflict);
         }
 
-        var response = new SurveyResponse(surveyId);
+
+        var response = new SurveyResponse(surveyId, _currentUser.UserId);
 
         _context.SurveyResponses.Add(response);
 
@@ -909,7 +913,7 @@ public class SurveyService : ISurveyService
     }
 
 
-    public async Task<Result<Survey>> GetQuestionAuthorizationResourceAsync( Guid questionId,  CancellationToken cancellationToken = default)
+    public async Task<Result<Survey>> GetQuestionAuthorizationResourceAsync(Guid questionId, CancellationToken cancellationToken = default)
     {
         var question = await _context.Questions
             .AsNoTracking()
@@ -924,22 +928,67 @@ public class SurveyService : ISurveyService
 
         var section = await _context.SurveySections
             .AsNoTracking()
-            .FirstOrDefaultAsync(  x => x.Id == question.SurveySectionId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == question.SurveySectionId, cancellationToken);
 
         if (section is null)
         {
-            return Result<Survey>.Failure( "Survey section was not found.", ErrorType.NotFound);
+            return Result<Survey>.Failure("Survey section was not found.", ErrorType.NotFound);
         }
 
-        var survey = await _context.Surveys.FirstOrDefaultAsync( x => x.Id == section.SurveyId,  cancellationToken);
+        var survey = await _context.Surveys.FirstOrDefaultAsync(x => x.Id == section.SurveyId, cancellationToken);
 
         if (survey is null)
         {
-            return Result<Survey>.Failure("Survey was not found.",  ErrorType.NotFound);
+            return Result<Survey>.Failure("Survey was not found.", ErrorType.NotFound);
         }
 
         return Result<Survey>.Success(survey);
     }
 
+
+    /// <summary>
+    /// Administrator response authorization resource retrieval for Resource based authorization
+    /// This is used to check if the user has access to the survey response for administrative purposes
+    /// </summary>
+    /// <param name="surveyId"></param>
+    /// <param name="responseId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<Result<Survey>> GetResponseAuthorizationResourceAsync(Guid surveyId,
+    Guid responseId, CancellationToken cancellationToken = default)
+    {
+        var response = await _context.SurveyResponses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == responseId && x.SurveyId == surveyId, cancellationToken);
+
+        if (response is null)
+        {
+            return Result<Survey>.Failure("Survey response was not found.", ErrorType.NotFound);
+        }
+
+        var survey = await _context.Surveys
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == surveyId, cancellationToken);
+
+        if (survey is null)
+        {
+            return Result<Survey>.Failure("Survey was not found.", ErrorType.NotFound);
+        }
+
+        return Result<Survey>.Success(survey);
+    }
+
+
+    public async Task<Result<SurveyResponse>> GetResponseResourceAsync(Guid surveyId,   Guid responseId,  CancellationToken cancellationToken = default)
+    {
+        var response = await _context.SurveyResponses.FirstOrDefaultAsync(x => x.Id == responseId &&  x.SurveyId == surveyId,  cancellationToken);
+
+        if (response is null)
+        {
+            return Result<SurveyResponse>.Failure("Survey response was not found.",   ErrorType.NotFound);
+        }
+
+        return Result<SurveyResponse>.Success(response);
+    }
 
 }

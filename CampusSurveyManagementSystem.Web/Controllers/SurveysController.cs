@@ -26,6 +26,7 @@ public class SurveysController : ControllerBase
     // GET: api/Surveys
     // ============================================================
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -80,7 +81,7 @@ public class SurveysController : ControllerBase
     // ============================================================
 
     [HttpPost]
-    [Authorize(Policy = Policies.CanManageSurveys)]
+    [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateSurveyRequest request, CancellationToken cancellationToken = default)
     {
         var result = await _surveyService.CreateAsync(request, cancellationToken);
@@ -98,8 +99,8 @@ public class SurveysController : ControllerBase
     // PUT: api/Surveys/{id}
     // ============================================================
 
-    [HttpPut("{id:guid}")]
-    [Authorize(Policy = Policies.CanManageSurveys)]
+    [Authorize]
+    [HttpPut("{id:guid}")]  
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSurveyRequest request, CancellationToken cancellationToken = default)
     {
         var resourceResult = await _surveyService.GetAuthorizationResourceAsync(id);
@@ -120,7 +121,7 @@ public class SurveysController : ControllerBase
 
         if (!result.Succeeded)
         {
-            return BadRequest(result.Errors);
+            return result.ToActionResult(this);
         }
 
         return NoContent();
@@ -131,6 +132,7 @@ public class SurveysController : ControllerBase
     // POST: api/Surveys/{surveyId}/sections
     // ============================================================
 
+    [Authorize]
     [HttpPost("{surveyId:guid}/sections")]
     public async Task<IActionResult> AddSection(Guid surveyId, [FromBody] CreateSectionRequest request,
         CancellationToken cancellationToken = default)
@@ -165,6 +167,7 @@ public class SurveysController : ControllerBase
     // POST: api/Surveys/sections/{sectionId}/questions
     // ============================================================
 
+    [Authorize]
     [HttpPost("sections/{sectionId:guid}/questions")]
     public async Task<IActionResult> AddQuestion(Guid sectionId, [FromBody] CreateQuestionRequest request,
         CancellationToken cancellationToken = default)
@@ -199,6 +202,7 @@ public class SurveysController : ControllerBase
     // POST: api/Surveys/questions/{questionId}/options
     // ============================================================
 
+    [Authorize]
     [HttpPost("questions/{questionId:guid}/options")]
     public async Task<IActionResult> AddQuestionOption(Guid questionId, [FromBody] CreateQuestionOptionRequest request,
         CancellationToken cancellationToken = default)
@@ -233,6 +237,7 @@ public class SurveysController : ControllerBase
     // PATCH: api/Surveys/{id}/schedule
     // ============================================================
 
+    [Authorize]
     [HttpPatch("{id:guid}/schedule")]
     public async Task<IActionResult> Schedule(Guid id, [FromBody] ScheduleSurveyRequest request,
         CancellationToken cancellationToken = default)
@@ -268,8 +273,9 @@ public class SurveysController : ControllerBase
     // PATCH: api/Surveys/{id}/publish
     // ============================================================
 
+
+    [Authorize]
     [HttpPatch("{id:guid}/publish")]
-    [Authorize(Policy = Policies.CanManageSurveys)]
     public async Task<IActionResult> Publish(Guid id, CancellationToken cancellationToken = default)
     {
         var resourceResult = await _surveyService.GetAuthorizationResourceAsync(id, cancellationToken);
@@ -302,6 +308,7 @@ public class SurveysController : ControllerBase
     // PATCH: api/Surveys/{id}/close
     // ============================================================
 
+    [Authorize]
     [HttpPatch("{id:guid}/close")]
     public async Task<IActionResult> Close(Guid id, CancellationToken cancellationToken = default)
     {
@@ -335,6 +342,7 @@ public class SurveysController : ControllerBase
     // PATCH: api/Surveys/{id}/archive
     // ============================================================
 
+    [Authorize]
     [HttpPatch("{id:guid}/archive")]
     public async Task<IActionResult> Archive(Guid id, CancellationToken cancellationToken = default)
     {
@@ -389,7 +397,7 @@ public class SurveysController : ControllerBase
     }
 
 
-
+    [AllowAnonymous]
     [HttpPost("{surveyId:guid}/responses/{responseId:guid}/answers")]
     public async Task<IActionResult> AddAnswer(Guid surveyId, Guid responseId, [FromBody] AddAnswerRequest request,
         CancellationToken cancellationToken = default)
@@ -404,7 +412,7 @@ public class SurveysController : ControllerBase
         return Ok(result.Value);
     }
 
-
+    [AllowAnonymous]
     [HttpPost("{surveyId:guid}/responses/{responseId:guid}/submit")]
     public async Task<IActionResult> SubmitResponse(Guid surveyId, Guid responseId,
         CancellationToken cancellationToken = default)
@@ -422,12 +430,12 @@ public class SurveysController : ControllerBase
         return Ok(result.Value);
     }
 
-
+    [Authorize]
     [HttpGet("{surveyId:guid}/responses/{responseId:guid}")]
     public async Task<IActionResult> GetResponse(Guid surveyId, Guid responseId,
     CancellationToken cancellationToken = default)
     {
-        var resourceResult = await _surveyService.GetAuthorizationResourceAsync(surveyId, cancellationToken);
+        var resourceResult = await _surveyService.GetResponseResourceAsync(surveyId, responseId, cancellationToken);
 
         if (!resourceResult.Succeeded)
         {
@@ -435,7 +443,7 @@ public class SurveysController : ControllerBase
 
         }
 
-        var authorizationResult =    await _authorizationService.AuthorizeAsync(User, resourceResult.Value!, AuthorizationPolicies.ViewResponses);
+        var authorizationResult =    await _authorizationService.AuthorizeAsync(User, resourceResult.Value!, AuthorizationPolicies.ResponseAccess);
 
         if (!authorizationResult.Succeeded)
         {
@@ -444,12 +452,7 @@ public class SurveysController : ControllerBase
 
         var result = await _surveyService.GetResponseAsync(surveyId, responseId, cancellationToken);
 
-        if (!result.Succeeded)
-        {
-            return NotFound(result.Errors);
-        }
-
-        return Ok(result.Value);
+        return result.ToActionResult(this);
     }
 
 
